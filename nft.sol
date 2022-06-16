@@ -1586,6 +1586,7 @@ contract Chiky is ERC1155, Ownable, ReentrancyGuard{
     address public treasury;
 
     event Minted(uint256 id, uint256 numberOfTokens, address minter);
+    event UriEdited(uint256 id, string uri);
     constructor(string memory NAME, address add) ERC1155(NAME){
        treasury = add;
         }
@@ -1610,13 +1611,13 @@ contract Chiky is ERC1155, Ownable, ReentrancyGuard{
         return(tokenCount.current());
         }
 
-        function batchMintNFT(address creator,
+        function batchMintNFT(address[] memory creator,
         uint256[] memory amounts, string[] memory uris ) external{ 
 
          require(isAdmin[msg.sender],"Access Denied ");
-        for(uint256 i=0; i< uris.length; i++){
+         for(uint256 i=0; i< uris.length; i++){
 
-           mintNFT(uris[i], amounts[i],creator);
+           mintNFT(uris[i], amounts[i],creator[i]);
 
         }
 
@@ -1626,6 +1627,7 @@ contract Chiky is ERC1155, Ownable, ReentrancyGuard{
 
             require(isAdmin[msg.sender],"Access Denied ");
             _uri[tokenID] = tokenUri;
+            emit UriEdited(tokenID, tokenUri);
 
         }
 
