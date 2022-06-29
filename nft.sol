@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT 
+ // SPDX-License-Identifier: MIT 
 pragma solidity 0.8.9;
 interface IERC165 {
     /**
@@ -138,7 +138,7 @@ abstract contract ERC165 is IERC165 {
         return interfaceId == type(IERC165).interfaceId;
     }
 }
-interface IERC1155Receiver is IERC165 {
+interface IERC1155Receiver {
     /**
         @dev Handles the receipt of a single ERC1155 token type. This function is
         called at the end of a `safeTransferFrom` after the balance has been updated.
@@ -729,7 +729,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         require(fromBalance >= amount, "ERC1155: burn amount exceeds balance");
         unchecked {
             _balances[id][from] = fromBalance - amount;
-        }
+                  }
 
         emit TransferSingle(operator, from, address(0), id, amount);
     }
@@ -963,90 +963,9 @@ abstract contract ReentrancyGuard {
         _status = _NOT_ENTERED;
     }
 }
-abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-        return interfaceId == type(IERC1155Receiver).interfaceId || super.supportsInterface(interfaceId);
-    }
-}
 
-abstract contract Pausable is Context {
-    /**
-     * @dev Emitted when the pause is triggered by `account`.
-     */
-    event Paused(address account);
 
-    /**
-     * @dev Emitted when the pause is lifted by `account`.
-     */
-    event Unpaused(address account);
 
-    bool private _paused;
-
-    /**
-     * @dev Initializes the contract in unpaused state.
-     */
-    constructor() {
-        _paused = false;
-    }
-
-    /**
-     * @dev Returns true if the contract is paused, and false otherwise.
-     */
-    function paused() public view virtual returns (bool) {
-        return _paused;
-    }
-
-    /**
-     * @dev Modifier to make a function callable only when the contract is not paused.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    modifier whenNotPaused() {
-        require(!paused(), "Pausable: paused");
-        _;
-    }
-
-    /**
-     * @dev Modifier to make a function callable only when the contract is paused.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    modifier whenPaused() {
-        require(paused(), "Pausable: not paused");
-        _;
-    }
-
-    /**
-     * @dev Triggers stopped state.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    function _pause() internal virtual whenNotPaused {
-        _paused = true;
-        emit Paused(_msgSender());
-    }
-
-    /**
-     * @dev Returns to normal state.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    function _unpause() internal virtual whenPaused {
-        _paused = false;
-        emit Unpaused(_msgSender());
-    }
-}
 library Counters {
     struct Counter {
         // This variable should never be directly accessed by users of the library: interactions must be restricted to
@@ -1075,218 +994,6 @@ library Counters {
 
     function reset(Counter storage counter) internal {
         counter._value = 0;
-    }
-}
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            uint256 c = a + b;
-            if (c < a) return (false, 0);
-            return (true, c);
-        }
-    }
-
-    /**
-     * @dev Returns the substraction of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b > a) return (false, 0);
-            return (true, a - b);
-        }
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-            // benefit is lost if 'b' is also tested.
-            // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-            if (a == 0) return (true, 0);
-            uint256 c = a * b;
-            if (c / a != b) return (false, 0);
-            return (true, c);
-        }
-    }
-
-    /**
-     * @dev Returns the division of two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b == 0) return (false, 0);
-            return (true, a / b);
-        }
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b == 0) return (false, 0);
-            return (true, a % b);
-        }
-    }
-
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     *
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a + b;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a - b;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     *
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a * b;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator.
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a / b;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a % b;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {trySub}.
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b <= a, errorMessage);
-            return a - b;
-        }
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b > 0, errorMessage);
-            return a / b;
-        }
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting with custom message when dividing by zero.
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {tryMod}.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b > 0, errorMessage);
-            return a % b;
-        }
     }
 }
 
@@ -1574,29 +1281,73 @@ library ECDSA {
     }
 }
 
-// 
-contract Chiky is ERC1155, Ownable, ReentrancyGuard{
+contract Chiky is ERC1155, Ownable, ReentrancyGuard, IERC1155Receiver{
 
     using Counters for Counters.Counter;
-    using SafeMath for uint256;
     Counters.Counter tokenCount;
+    Counters.Counter private _itemIds;     //count of sale items
+    Counters.Counter private _itemsSold;  //count of sold items
+    Counters.Counter private _itemsinActive;
+
+    address payable _seller;
+    address payable _minter;
     mapping(uint256 => string) public _uri;
     mapping(uint256 => address) public minter; 
     mapping(address => bool) public isAdmin;
     address public treasury;
 
+    uint256 public treasuryRoyalty = 2;
+  
+
+    event Minted(uint256 id, address minter);
+    struct MarketItem {
+    uint itemId;
+    uint256 tokenId;
+    address payable seller;
+    address payable owner;
+    uint256 price;
+    bool sold;
+    bool isActive;
+  }
+
+  mapping(uint256 => MarketItem) public idToMarketItem;
+
+  event saleCreated (
+    uint indexed itemId,
+    uint256 indexed tokenId,
+    address seller,
+    address owner,
+    uint256 price,
+    bool sold,
+    bool isActive
+  );
+
+  event ItemBought(
+    uint indexed itemId,
+    uint256 indexed tokenId,
+    address buyer,
+    uint256 price,
+    bool sold,
+    bool isActive
+     );
+
+
+   
+
     event Minted(uint256 id, uint256 numberOfTokens, address minter);
     event UriEdited(uint256 id, string uri);
     constructor(string memory NAME, address add) ERC1155(NAME){
        treasury = add;
+       isAdmin[msg.sender] = true;
         }
 
-        function mintNFT(string memory _projectUri, uint256 supply, address creator) public  {  
+        function mintNFT(string memory _projectUri, uint256 supply, address creator, uint256 price) public  {  
 
         require(isAdmin[msg.sender] || msg.sender == address(this),"Access Denied ");
         uint256 nftId = tokenCount.current();
          _uri[nftId] = _projectUri;
         _mint(creator,nftId,supply,"");
+        createSale(nftId, price, creator);
         tokenCount.increment();
         emit Minted(nftId, supply, creator);
         }
@@ -1612,16 +1363,37 @@ contract Chiky is ERC1155, Ownable, ReentrancyGuard{
         }
 
         function batchMintNFT(address[] memory creator,
-        uint256[] memory amounts, string[] memory uris ) external{ 
+        uint256[] memory amounts, string[] memory uris, uint256[] memory prices) external{ 
 
          require(isAdmin[msg.sender],"Access Denied ");
          for(uint256 i=0; i< uris.length; i++){
 
-           mintNFT(uris[i], amounts[i],creator[i]);
+           mintNFT(uris[i], amounts[i],creator[i], prices[i]);
 
         }
-
         }
+
+        receive() external payable {}
+        fallback() external payable {}
+
+        function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
+        return this.onERC1155Received.selector;
+        }
+
+        function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+        }
+
+        function setTreasuryRoyalty(uint256 _royalty) external onlyOwner {
+           treasuryRoyalty = _royalty;
+           }
+
+
+            function setTreasury(address _treasury) external onlyOwner {
+            treasury = payable(_treasury);
+             }
+
+        
 
         function setUri(uint256 tokenID, string memory tokenUri) external{
 
@@ -1636,10 +1408,164 @@ contract Chiky is ERC1155, Ownable, ReentrancyGuard{
             isAdmin[user] = admin;
         }
 
+    function createSale(
+    uint256 tokenId,
+    uint256 price, address seller
+  ) public  {
+    require(price > 0, "Price must be at least 1 wei");
+     require(IERC1155(address(this)).isApprovedForAll(seller, address(this)),
+     "Caller must be approved or owner for token id");
+     require(IERC1155(address(this)).balanceOf(seller, tokenId)>0,"Balance 0");
+
+    _itemIds.increment();
+    uint256 itemId = _itemIds.current();
+    idToMarketItem[itemId] =  MarketItem(
+      itemId,
+      tokenId,
+      payable(seller),
+      payable(treasury),
+      price,
+      false,
+      true 
+    );
+    emit saleCreated(
+      itemId,
+      tokenId,
+      seller,
+      treasury,
+      price,
+      false,
+      true 
+    );
+  }
 
 
-        
+
    
+    function buyItem(
+    uint256 itemId
+    ) external payable nonReentrant   {
+    require(itemId <= _itemIds.current(), " Enter a valid Id");
+    require( idToMarketItem[itemId].isActive==true,"the sale is not active");
+    require(msg.sender!= idToMarketItem[itemId].seller,"seller cannot buy");
+
+    uint price = idToMarketItem[itemId].price;
+    uint tokenId = idToMarketItem[itemId].tokenId;
+    
+
+    require(msg.value == price, "Please submit the asking price in order to complete the purchase");
+    require( idToMarketItem[itemId].sold == false,"Already Sold");
+  
+     _seller = idToMarketItem[itemId].seller;
+   
+
+
+    uint256 amountToadmin = ((msg.value)*((treasuryRoyalty)))/(100) ;
+    uint256 remainingAmount = (msg.value)-(amountToadmin);
+    payable(treasury).transfer(amountToadmin);
+    payable(_seller).transfer(remainingAmount);
+
+
+
+
+    IERC1155(address(this)).safeTransferFrom(idToMarketItem[itemId].seller, msg.sender, tokenId,1,"");
+
+    idToMarketItem[itemId].owner = payable(msg.sender);
+    idToMarketItem[itemId].sold = true;
+    idToMarketItem[itemId].isActive = false;
+    _itemsSold.increment();
+    _itemsinActive.increment();
+
+     emit ItemBought(
+      itemId,
+      tokenId,
+      msg.sender,
+      msg.value,
+      true,
+      false
+     );
+    
+  } 
+
+
+
+  function EndSale(uint256 itemId) external nonReentrant {
+
+       require(itemId <= _itemIds.current(), " Enter a valid Id");
+      require(msg.sender==idToMarketItem[itemId].seller
+       && idToMarketItem[itemId].sold == false && idToMarketItem[itemId].isActive == true,"Cannot End Sale" );
+      idToMarketItem[itemId].isActive = false;
+      _itemsinActive.increment();
+    
+      
+  }
+
+  /* Returns all unsold market items */
+  function fetchMarketItems() public view returns (MarketItem[] memory) {
+    uint itemCount = _itemIds.current();
+    uint unsoldItemCount = _itemIds.current()-(_itemsinActive.current());
+    uint currentIndex = 0;
+
+    MarketItem[] memory items = new MarketItem[](unsoldItemCount);
+    for (uint i = 0; i < itemCount; i++) {
+      if ( idToMarketItem[i+(1)].isActive ==true )
+      {
+        uint currentId = i+(1);
+        MarketItem storage currentItem = idToMarketItem[currentId];
+        items[currentIndex] = currentItem;
+        currentIndex = currentIndex+(1);
+      }
+    }
+    return items;
+  }
+
+  /* Returns  items that a user has purchased */
+  function fetchMyNFTs() public view returns (MarketItem[] memory) {
+    uint totalItemCount = _itemIds.current();
+    uint itemCount = 0;
+    uint currentIndex = 0;
+
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i+(1)].owner == msg.sender) {
+        itemCount = itemCount+(1) ;
+      }
+    }
+
+    MarketItem[] memory items = new MarketItem[](itemCount);
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i+(1)].owner == msg.sender) {
+        uint currentId = i+(1);
+        MarketItem storage currentItem = idToMarketItem[currentId];
+        items[currentIndex] = currentItem;
+        currentIndex = currentIndex+(1);
+      }
+    }
+    return items;
+  }
+    
+
+  /* Returns only items a user has created */
+  function fetchItemsCreated() public view returns (MarketItem[] memory) {
+    uint totalItemCount = _itemIds.current();
+    uint itemCount = 0;
+    uint currentIndex = 0;
+
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i+(1)].seller == msg.sender) {
+        itemCount = itemCount+(1);
+      }
+    }
+    MarketItem[] memory items = new MarketItem[](itemCount);
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i+(1)].seller == msg.sender) {
+        uint currentId = i+(1);
+        MarketItem storage currentItem = idToMarketItem[currentId];
+        items[currentIndex] = currentItem;
+        currentIndex = currentIndex+(1) ;
+      }
+    }
+    return items;
+  }
 
 
 }
